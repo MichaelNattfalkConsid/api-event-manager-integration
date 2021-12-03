@@ -18,16 +18,6 @@ if (! defined('WPINC')) {
     die;
 }
 
-// Require composer dependencies (autoloader)
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require_once __DIR__ . '/vendor/autoload.php';
-}
-
-// Include vendor files
-if (file_exists(dirname(ABSPATH) . '/vendor/autoload.php')) {
-    require_once dirname(ABSPATH) . '/vendor/autoload.php';
-}
-
 define('EVENTMANAGERINTEGRATION_ID', '0.6.6');
 define('EVENTMANAGERINTEGRATION_PATH', plugin_dir_path(__FILE__));
 define('EVENTMANAGERINTEGRATION_URL', plugins_url('', __FILE__));
@@ -37,6 +27,19 @@ define('EVENTMANAGERINTEGRATION_SUBMIT_FORM_MODULE_VIEW_PATH', EVENTMANAGERINTEG
 define('EVENTMANAGERINTEGRATION_CACHE_DIR', trailingslashit(wp_upload_dir()['basedir']) . 'cache/blade-cache/');
 
 load_plugin_textdomain('event-integration', false, plugin_basename(dirname(__FILE__)) . '/languages');
+
+
+// Autoload from ABSPATH first and plugin path as alternative.
+$rootAutoload = dirname(ABSPATH) . '/vendor/autoload.php';
+$pluginAutoload = EVENTMANAGERINTEGRATION_PATH . '/vendor/autoload.php';
+
+if (file_exists($rootAutoload)) {
+    require_once $rootAutoload;
+} elseif (file_exists($pluginAutoload)) {
+    require_once $pluginAutoload;
+} else {
+    die('Cant find autoload, run composer install!');
+}
 
 require_once EVENTMANAGERINTEGRATION_PATH . 'source/php/Vendor/Psr4ClassLoader.php';
 require_once EVENTMANAGERINTEGRATION_PATH . 'Public.php';
